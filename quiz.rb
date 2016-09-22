@@ -20,8 +20,24 @@ class Classroom
         raise "Bad Format" unless header == expected_header
         file.readlines.each do |line|
             strand_id,strand_name,standard_id,standard_name,question_id,difficulty = line.split(",")
-            unless @strands[strand_id]
+            strand = @strands[strand_id]
+            unless strand
+                #make strand
             end
+            standard = strand.standards[standard_id]
+            unless standard
+                #make standard
+            end
+            question = Question(question_id, difficulty, standard)
+            standard.questions[question_id] = question
         end
+    end
+end
+
+def Question
+    def initialize(id, difficulty, standard=nil)
+        @id = id
+        @difficulty = difficulty
+        @standard = standard
     end
 end
