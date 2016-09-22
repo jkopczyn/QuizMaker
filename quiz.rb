@@ -12,7 +12,13 @@ class Classroom
 
     def generate_quiz_for_user(id, how_many)
         user = @users[id]
-        return [0]*how_many
+        #assume all strands and ignore user for now
+        evenly = how_many / @strands.length
+        remainder = how_many % @strands.length
+        requests = Hash[@strands.map { |k, v| [k, evenly] }]
+        remainder.times { requests[@strands.sample] += 1 }
+        return requests.map { |k, number|
+            @strands[k].question_list(number) }.inject(&:+)
     end
 
     private
