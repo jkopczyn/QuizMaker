@@ -17,8 +17,9 @@ class Classroom
         remainder = how_many % @strands.length
         requests = Hash[@strands.map { |k, v| [k, evenly] }]
         remainder.times { requests[@strands.sample] += 1 }
-        return requests.map { |k, number|
-            @strands[k].question_list(number) }.inject(&:+)
+        return requests.map do |k, number|
+            @strands[k].question_list(number)
+        end.inject(&:+)
     end
 
     private
@@ -61,6 +62,17 @@ class Strand
     def question_count
         @standards.values.map(&:question_count).inject(&:+)
     end
+
+    def question_list(number)
+        evenly = number / @standards.length
+        remainder = number % @standards.length
+        requests = Hash[@standards.map { |k, v| [k, evenly] }]
+        remainder.times { requests[@standards.sample] += 1 }
+        return requests.map do |k, n|
+            @standards[k].question_list(n)
+        end.inject(&:+)
+    end
+
 end
 
 class Standard
@@ -74,6 +86,11 @@ class Standard
 
     def question_count
         @questions.length
+    end
+
+    def question_list(length)
+        long_enough = (@questions.keys.shuffle) * (1 + length / question_count)
+        return long_enough.take(length)
     end
 end
 
