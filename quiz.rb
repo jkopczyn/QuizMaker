@@ -1,4 +1,6 @@
 class Classroom
+    attr_accessor :strands,:users
+
     def initialize(filename=nil)
         @strands = {}
         @users = {}
@@ -10,7 +12,7 @@ class Classroom
 
     def generate_quiz_for_user(id, how_many)
         user = @users[id]
-        return [0]*how_many if user
+        return [0]*how_many
     end
 
     private
@@ -20,18 +22,19 @@ class Classroom
         raise "Bad Format" unless header == expected_header
         file.readlines.each do |line|
             strand_id,strand_name,standard_id,standard_name,question_id,difficulty = line.strip.split(",")
-            strand = @strands[strand_id]
+            strand = @strands[strand_id.to_i]
             unless strand
-                strand = Strand.new(strand_id, strand_name)
-                @strands[strand_id] = strand
+                strand = Strand.new(strand_id.to_i, strand_name)
+                @strands[strand_id.to_i] = strand
             end
-            standard = strand.standards[standard_id]
+            standard = strand.standards[standard_id.to_i]
             unless standard
-                standard = Standard.new(standard_id, standard_name, strand)
-                strand.standards[standard_id] = standard
+                standard = Standard.new(standard_id.to_i, standard_name, strand)
+                strand.standards[standard_id.to_i] = standard
             end
-            question = Question.new(question_id, difficulty, standard)
-            standard.questions[question_id] = question
+            raise "overwriting question is bad" if standard.questions[question_id.to_i]
+            question = Question.new(question_id.to_i, difficulty, standard)
+            standard.questions[question_id.to_i] = question
         end
     end
 end
@@ -50,7 +53,7 @@ class Strand
     end
 
     def question_count
-        @standards.map(:question_count).inject(&:+)
+        @standards.values.map(&:question_count).inject(&:+)
     end
 end
 
