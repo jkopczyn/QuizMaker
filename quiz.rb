@@ -16,7 +16,7 @@ class Classroom
         evenly = how_many / @strands.length
         remainder = how_many % @strands.length
         requests = Hash[@strands.map { |k, v| [k, evenly] }]
-        remainder.times { requests[@strands.keys.sample] += 1 }
+        @strands.keys.shuffle.take(remainder).each{ |k| requests[k] += 1 }
         return requests.map do |k, number|
             @strands[k].question_list(number)
         end.inject(&:+)
@@ -67,7 +67,7 @@ class Strand
         evenly = number / @standards.length
         remainder = number % @standards.length
         requests = Hash[@standards.map { |k, v| [k, evenly] }]
-        remainder.times { requests[@standards.keys.sample] += 1 }
+        @standards.keys.shuffle.take(remainder).each{ |k| requests[k] += 1 }
         return requests.map do |k, n|
             @standards[k].question_list(n)
         end.inject(&:+)
