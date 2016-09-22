@@ -34,6 +34,30 @@ class Classroom
     end
 end
 
+def Strand
+    def initialize(id, name, standards=Hash.new())
+        @id = id
+        @name = name
+        @standards = standards
+    end
+
+    def standard_count
+        @standards.length
+    end
+end
+
+def Standard
+    def initialize(id, difficulty, strand=nil, questions=Hash.new())
+        @id = id
+        @name = name
+        @questions = questions
+    end
+
+    def question_count
+        @questions.length
+    end
+end
+
 def Question
     def initialize(id, difficulty, standard=nil)
         @id = id

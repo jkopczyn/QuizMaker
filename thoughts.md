@@ -3,6 +3,7 @@ I'm unclear on the purpose of the usage file. Should a student get exclusively q
 I'm going to operate under the assumption that all assigned but unanswered questions (in a Standard/Strand) should be assigned before any other.
 
 Oh, wait, that's in the bonus requirements. And parsing the CSVs is _optional_. Sure, technically. I'm doing it anyway, that's obviously the Right Thing.
+(note: this may have been a wrong decision)
 
 
 Structure:
