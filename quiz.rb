@@ -4,7 +4,7 @@ class Classroom
         @users = {}
         if filename
             file = File.open(filename, "r")
-            self.parse(file) if file
+            parse(file) if file
         end
     end
 
@@ -16,25 +16,29 @@ class Classroom
     private
     def parse(file)
         expected_header = [:strand_id,:strand_name,:standard_id,:standard_name,:question_id,:difficulty]
-        header = file.readline.split(",").map(:to_sym)
+        header = file.readline.strip.split(",").map(&:to_sym)
         raise "Bad Format" unless header == expected_header
         file.readlines.each do |line|
-            strand_id,strand_name,standard_id,standard_name,question_id,difficulty = line.split(",")
+            strand_id,strand_name,standard_id,standard_name,question_id,difficulty = line.strip.split(",")
             strand = @strands[strand_id]
             unless strand
-                #make strand
+                strand = Strand.new(strand_id, strand_name)
+                @strands[strand_id] = strand
             end
             standard = strand.standards[standard_id]
             unless standard
-                #make standard
+                standard = Standard.new(standard_id, standard_name, strand)
+                strand.standards[standard_id] = standard
             end
-            question = Question(question_id, difficulty, standard)
+            question = Question.new(question_id, difficulty, standard)
             standard.questions[question_id] = question
         end
     end
 end
 
-def Strand
+class Strand
+    attr_accessor :standards, :id, :name
+
     def initialize(id, name, standards=Hash.new())
         @id = id
         @name = name
@@ -44,9 +48,15 @@ def Strand
     def standard_count
         @standards.length
     end
+
+    def question_count
+        @standards.map(:question_count).inject(&:+)
+    end
 end
 
-def Standard
+class Standard
+    attr_accessor :questions, :id, :name
+
     def initialize(id, difficulty, strand=nil, questions=Hash.new())
         @id = id
         @name = name
@@ -58,7 +68,9 @@ def Standard
     end
 end
 
-def Question
+class Question
+    attr_accessor :id, :difficulty
+
     def initialize(id, difficulty, standard=nil)
         @id = id
         @difficulty = difficulty
