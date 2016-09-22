@@ -34,9 +34,16 @@ Question has:
 Classroom has:
     strands
     users
+    initialize(file=None)
+        private parse(filename)
     generate_quiz_for_user(id, how_many)
 
 User has:
     id
     classroom
 initially just that, not going to parse usages for v1
+
+Quiz has:
+    initialize(user, strands)
+    populate_quiz(how_many_questions)
+    print_questions
