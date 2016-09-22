@@ -103,3 +103,8 @@ class Question
         @standard = standard
     end
 end
+
+
+file, user, number = ARGV
+room = Classroom.new(file)
+puts room.generate_quiz_for_user(user.to_i, number.to_i)
