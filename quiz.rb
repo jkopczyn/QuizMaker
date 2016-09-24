@@ -1,8 +1,8 @@
 class Classroom
-    attr_accessor :strands,:users
+    attr_accessor :curriculums,:users
 
     def initialize(filename=nil)
-        @strands = {}
+        @curriculums = {}
         @users = {}
         if filename
             file = File.open(filename, "r")
@@ -12,73 +12,73 @@ class Classroom
 
     def generate_quiz_for_user(id, how_many)
         user = @users[id]
-        #assume all strands and ignore user for now
-        evenly = how_many / @strands.length
-        remainder = how_many % @strands.length
-        requests = Hash[@strands.map { |k, v| [k, evenly] }]
-        @strands.keys.shuffle.take(remainder).each{ |k| requests[k] += 1 }
+        #assume all curriculums and ignore user for now
+        evenly = how_many / @curriculums.length
+        remainder = how_many % @curriculums.length
+        requests = Hash[@curriculums.map { |k, v| [k, evenly] }]
+        @curriculums.keys.shuffle.take(remainder).each{ |k| requests[k] += 1 }
         return requests.map do |k, number|
-            @strands[k].question_list(number)
+            @curriculums[k].question_list(number)
         end.inject(&:+)
     end
 
     private
     def parse(file)
-        expected_header = [:strand_id,:strand_name,:standard_id,:standard_name,:question_id,:difficulty]
+        expected_header = [:curriculum_id,:curriculum_name,:concept_id,:concept_name,:question_id,:difficulty]
         header = file.readline.strip.split(",").map(&:to_sym)
         raise "Bad Format" unless header == expected_header
         file.readlines.each do |line|
-            strand_id,strand_name,standard_id,standard_name,question_id,difficulty = line.strip.split(",")
-            strand = @strands[strand_id.to_i]
-            unless strand
-                strand = Strand.new(strand_id.to_i, strand_name)
-                @strands[strand_id.to_i] = strand
+            curriculum_id,curriculum_name,concept_id,concept_name,question_id,difficulty = line.strip.split(",")
+            curriculum = @curriculums[curriculum_id.to_i]
+            unless curriculum
+                curriculum = Curriculum.new(curriculum_id.to_i, curriculum_name)
+                @curriculums[curriculum_id.to_i] = curriculum
             end
-            standard = strand.standards[standard_id.to_i]
-            unless standard
-                standard = Standard.new(standard_id.to_i, standard_name, strand)
-                strand.standards[standard_id.to_i] = standard
+            concept = curriculum.concepts[concept_id.to_i]
+            unless concept
+                concept = Concept.new(concept_id.to_i, concept_name, curriculum)
+                curriculum.concepts[concept_id.to_i] = concept
             end
-            raise "overwriting question is bad" if standard.questions[question_id.to_i]
-            question = Question.new(question_id.to_i, difficulty, standard)
-            standard.questions[question_id.to_i] = question
+            raise "overwriting question is bad" if concept.questions[question_id.to_i]
+            question = Question.new(question_id.to_i, difficulty, concept)
+            concept.questions[question_id.to_i] = question
         end
     end
 end
 
-class Strand
-    attr_accessor :standards, :id, :name
+class Curriculum
+    attr_accessor :concepts, :id, :name
 
-    def initialize(id, name, standards=Hash.new())
+    def initialize(id, name, concepts=Hash.new())
         @id = id
         @name = name
-        @standards = standards
+        @concepts = concepts
     end
 
-    def standard_count
-        @standards.length
+    def concept_count
+        @concepts.length
     end
 
     def question_count
-        @standards.values.map(&:question_count).inject(&:+)
+        @concepts.values.map(&:question_count).inject(&:+)
     end
 
     def question_list(number)
-        evenly = number / @standards.length
-        remainder = number % @standards.length
-        requests = Hash[@standards.map { |k, v| [k, evenly] }]
-        @standards.keys.shuffle.take(remainder).each{ |k| requests[k] += 1 }
+        evenly = number / @concepts.length
+        remainder = number % @concepts.length
+        requests = Hash[@concepts.map { |k, v| [k, evenly] }]
+        @concepts.keys.shuffle.take(remainder).each{ |k| requests[k] += 1 }
         return requests.map do |k, n|
-            @standards[k].question_list(n)
+            @concepts[k].question_list(n)
         end.inject(&:+)
     end
 
 end
 
-class Standard
+class Concept
     attr_accessor :questions, :id, :name
 
-    def initialize(id, difficulty, strand=nil, questions=Hash.new())
+    def initialize(id, difficulty, curriculum=nil, questions=Hash.new())
         @id = id
         @name = name
         @questions = questions
@@ -97,14 +97,16 @@ end
 class Question
     attr_accessor :id, :difficulty
 
-    def initialize(id, difficulty, standard=nil)
+    def initialize(id, difficulty, concept=nil)
         @id = id
         @difficulty = difficulty
-        @standard = standard
+        @concept = concept
     end
 end
 
 
-file, user, number = ARGV
-room = Classroom.new(file)
-puts room.generate_quiz_for_user(user.to_i, number.to_i)
+if __FILE__ == $0
+    file, user, number = ARGV
+    room = Classroom.new(file)
+    puts room.generate_quiz_for_user(user.to_i, number.to_i)
+end
