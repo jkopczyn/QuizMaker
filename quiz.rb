@@ -106,7 +106,7 @@ end
 
 
 if __FILE__ == $0
-    file, user, number = ARGV
+    file, number, user_data, user = ARGV
     room = Classroom.new(file)
     puts room.generate_quiz_for_user(user.to_i, number.to_i)
 end
