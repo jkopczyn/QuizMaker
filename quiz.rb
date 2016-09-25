@@ -2,9 +2,8 @@ def questions_from_set(number_wanted, set)
     #outputs array of keys with the desired number of elements
     # requires that the elements of the dict have a :question_list method
     # and use that to pick within them
-    evenly = number_wanted / set.length
-    remainder = number_wanted % set.length
-    requests = Hash[set.map { |k, v| [k, evenly] }]
+    quotient, remainder = number_wanted.divmod(set.length)
+    requests = Hash[set.map { |k, v| [k, quotient] }]
     set.keys.shuffle.take(remainder).each{ |k| requests[k] += 1 }
     return requests.map do |k, n|
         set[k].question_list(n)
