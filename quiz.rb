@@ -1,3 +1,16 @@
+def questions_from_set(number_wanted, set)
+    #outputs array of keys with the desired number of elements
+    # requires that the elements of the dict have a :question_list method
+    # and use that to pick within them
+    evenly = number_wanted / set.length
+    remainder = number_wanted % set.length
+    requests = Hash[set.map { |k, v| [k, evenly] }]
+    set.keys.shuffle.take(remainder).each{ |k| requests[k] += 1 }
+    return requests.map do |k, n|
+        set[k].question_list(n)
+    end.inject(&:+)
+end
+
 class Classroom
     attr_accessor :curriculums,:users
 
@@ -13,13 +26,7 @@ class Classroom
     def generate_quiz_for_user(id, how_many)
         user = @users[id]
         #assume all curriculums and ignore user for now
-        evenly = how_many / @curriculums.length
-        remainder = how_many % @curriculums.length
-        requests = Hash[@curriculums.map { |k, v| [k, evenly] }]
-        @curriculums.keys.shuffle.take(remainder).each{ |k| requests[k] += 1 }
-        return requests.map do |k, number|
-            @curriculums[k].question_list(number)
-        end.inject(&:+)
+        questions_from_set(how_many, @curriculums)
     end
 
     private
@@ -64,13 +71,7 @@ class Curriculum
     end
 
     def question_list(number)
-        evenly = number / @concepts.length
-        remainder = number % @concepts.length
-        requests = Hash[@concepts.map { |k, v| [k, evenly] }]
-        @concepts.keys.shuffle.take(remainder).each{ |k| requests[k] += 1 }
-        return requests.map do |k, n|
-            @concepts[k].question_list(n)
-        end.inject(&:+)
+        questions_from_set(number, @concepts)
     end
 
 end
