@@ -1,13 +1,14 @@
+require "byebug"
+
 def questions_from_set(number_wanted, set)
     #outputs array of keys with the desired number of elements
     # requires that the elements of the dict have a :question_list method
     # and use that to pick within them
     quotient, remainder = number_wanted.divmod(set.length)
-    requests = Hash[set.map { |k, v| [k, quotient] }]
-    set.keys.shuffle.take(remainder).each{ |k| requests[k] += 1 }
-    return requests.map do |k, n|
-        set[k].question_list(n)
-    end.inject(&:+)
+    requests = Hash[set.keys.shuffle.each_with_index.map do |k, idx|
+        [k, quotient + (idx < remainder ? 1 : 0) ]
+    end ]
+    requests.map { |k, n| set[k].question_list(n) }.inject(&:+)
 end
 
 class Classroom
