@@ -1,14 +1,13 @@
 require "byebug"
 
-def questions_from_set(number_wanted, set)
+def questions_from_dict(number_wanted, dict)
     #outputs array of keys with the desired number of elements
     # requires that the elements of the dict have a :question_list method
     # and use that to pick within them
-    quotient, remainder = number_wanted.divmod(set.length)
-    requests = Hash[set.keys.shuffle.each_with_index.map do |k, idx|
+    quotient, remainder = number_wanted.divmod(dict.length)
+    Hash[dict.keys.shuffle.each_with_index.map do |k, idx|
         [k, quotient + (idx < remainder ? 1 : 0) ]
-    end ]
-    requests.map { |k, n| set[k].question_list(n) }.inject(&:+)
+    end ].map { |k, n| dict[k].question_list(n) }.inject(&:+)
 end
 
 class Classroom
@@ -26,7 +25,7 @@ class Classroom
     def generate_quiz_for_user(id, how_many)
         user = @users[id]
         #assume all curriculums and ignore user for now
-        questions_from_set(how_many, @curriculums)
+        questions_from_dict(how_many, @curriculums)
     end
 
     private
@@ -71,7 +70,7 @@ class Curriculum
     end
 
     def question_list(number)
-        questions_from_set(number, @concepts)
+        questions_from_dict(number, @concepts)
     end
 
 end
