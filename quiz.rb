@@ -40,16 +40,16 @@ class Classroom
             curriculum = @curriculums[curriculum_id.to_i]
             unless curriculum
                 curriculum = Curriculum.new(curriculum_id.to_i, curriculum_name)
-                @curriculums[curriculum_id.to_i] = curriculum
+                @curriculums[curriculum.id] = curriculum
             end
             concept = curriculum.concepts[concept_id.to_i]
             unless concept
                 concept = Concept.new(concept_id.to_i, concept_name, curriculum)
-                curriculum.concepts[concept_id.to_i] = concept
+                curriculum.concepts[concept.id] = concept
             end
             raise "overwriting question is bad" if concept.questions[question_id.to_i]
-            question = Question.new(question_id.to_i, difficulty, concept)
-            concept.questions[question_id.to_i] = question
+            question = Question.new(question_id.to_i, difficulty.to_f, concept)
+            concept.questions[question.id] = question
         end
     end
 
@@ -85,10 +85,11 @@ class Curriculum
 end
 
 class Concept
-    attr_accessor :questions, :id, :name
+    attr_accessor :questions, :id, :name, :curriculum
 
-    def initialize(id, difficulty, curriculum=nil, questions=Hash.new())
+    def initialize(id, name, curriculum=nil, questions=Hash.new())
         @id = id
+        @curriculum = curriculum
         @name = name
         @questions = questions
     end
@@ -98,14 +99,14 @@ class Concept
     end
 
     def question_list(length)
-        long_enough = (@questions.keys.shuffle) * (1 + length / question_count)
-        picked = long_enough.take(length)
-        return picked.sort { |question| question.difficulty }.map(&:id)
+        long_enough = (@questions.values.shuffle) * (1 + length / question_count)
+        picked = long_enough.take(length).sort_by { |question| question.difficulty }
+        return picked.map(&:id)
     end
 end
 
 class Question
-    attr_accessor :id, :difficulty
+    attr_accessor :id, :difficulty, :concept
 
     def initialize(id, difficulty, concept=nil)
         @id = id
@@ -118,5 +119,5 @@ end
 if __FILE__ == $0
     file, number, user_data, user = ARGV
     room = Classroom.new(file)
-    puts room.generate_quiz_for_user(user.to_i, number.to_i)
+    puts room.generate_quiz_for_user(user.to_i, number.to_i).to_s
 end
