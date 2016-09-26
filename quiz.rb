@@ -13,12 +13,12 @@ end
 class Classroom
     attr_accessor :curriculums,:users
 
-    def initialize(filename=nil)
+    def initialize(question_filename=nil)
         @curriculums = {}
         @users = {}
-        if filename
-            file = File.open(filename, "r")
-            parse(file) if file
+        if question_filename
+            file = File.open(question_filename, "r")
+            parse_questions(file) if file
         end
     end
 
@@ -29,10 +29,12 @@ class Classroom
     end
 
     private
-    def parse(file)
-        expected_header = [:curriculum_id,:curriculum_name,:concept_id,:concept_name,:question_id,:difficulty]
+    def parse_questions(file)
+        expected_header = [:curriculum_id, :curriculum_name,
+                           :concept_id, :concept_name,
+                           :question_id, :difficulty]
         header = file.readline.strip.split(",").map(&:to_sym)
-        raise "Bad Format" unless header == expected_header
+        raise "Bad Format For Question File" unless header == expected_header
         file.readlines.each do |line|
             curriculum_id,curriculum_name,concept_id,concept_name,question_id,difficulty = line.strip.split(",")
             curriculum = @curriculums[curriculum_id.to_i]
@@ -49,6 +51,13 @@ class Classroom
             question = Question.new(question_id.to_i, difficulty, concept)
             concept.questions[question_id.to_i] = question
         end
+    end
+
+    def parse_users(file)
+        expected_header = [:student_id, :question_id,
+                           :assigned_hour_ago, :answered_hours_ago]
+        header = file.readline.strip.split(",").map(&:to_sym)
+        raise "Bad Format For User File" unless header == expected_header
     end
 end
 
