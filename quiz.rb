@@ -99,7 +99,8 @@ class Concept
 
     def question_list(length)
         long_enough = (@questions.keys.shuffle) * (1 + length / question_count)
-        return long_enough.take(length)
+        picked = long_enough.take(length)
+        return picked.sort { |question| question.difficulty }.map(&:id)
     end
 end
 
