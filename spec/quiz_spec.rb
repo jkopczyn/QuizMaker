@@ -11,9 +11,8 @@ describe Concept do
         @id = 7
         @name = "TestNamePleaseIgnore"
         @curriculum = Curriculum.new(3, "")
-        @question_id = 15
-        @question = Question.new(@question_id, 0.73468)
-        @questions = {@question_id => @question}
+        @question = Question.new(15, 0.73468)
+        @questions = {@question.id => @question}
         @concept = @c = Concept.new(@id, @name, @curriculum, @questions)
     end
     it "has an ID and name" do
@@ -27,9 +26,35 @@ describe Concept do
         expect(@c.curriculum).to be(@curriculum)
     end
 
-    it "can access its @questions" do
+    it "can access its questions" do
         expect(@c.questions).not_to be_empty
-        expect(@c.questions[@question_id]).to be(@question)
+        expect(@c.questions[@question.id]).to be(@question)
+    end
+
+    it "can count its questions" do
+        expect(@c.question_count).to be 1
+    end
+
+    it "can modify its questions" do
+        new_question = Question.new(5, 0.34)
+        @c.questions[new_question.id] = new_question
+        expect(@c.questions.keys).to include(new_question.id)
+        expect(@c.questions[new_question.id]).to be(new_question)
+    end
+
+    it "counts added questions" do
+        expect(@c.question_count).to be 1
+        new_question = Question.new(5, 0.34)
+        @c.questions[new_question.id] = new_question
+        expect(@c.question_count).to be 2
+    end
+
+    it "generates question lists" do
+        new_question = Question.new(5, 0.34)
+        @c.questions[new_question.id] = new_question
+        list = @c.question_list(6)
+        expect(list.length).to be 6
+        expect(list).to include(new_question.id, @question.id)
     end
 end
 
