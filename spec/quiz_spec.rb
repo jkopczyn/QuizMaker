@@ -54,6 +54,17 @@ describe Concept do
         expect(list.length).to be 6
         expect(list).to include(@new_question.id, @question.id)
     end
+
+    def questions_sorted?(question_list)
+        question_list[0...-1].each_with_index.map do |q, idx|
+            q.difficulty <= question_list[idx+1].difficulty
+        end.all?
+    end
+    it "generates question lists sorted by difficulty" do
+        @c.questions[@new_question.id] = @new_question
+        list_question_objects = @c.question_list(6).map { |v| @c.questions[v] }
+        expect(questions_sorted?(list_question_objects))
+    end
 end
 
 describe Question do
