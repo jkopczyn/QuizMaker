@@ -115,6 +115,9 @@ class Question
     end
 end
 
+class Student
+end
+
 
 if __FILE__ == $0
     file, number, user_data, user = ARGV
