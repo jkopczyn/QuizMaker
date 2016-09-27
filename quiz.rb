@@ -62,7 +62,7 @@ class Classroom
 end
 
 class Curriculum
-    attr_accessor :concepts, :id, :name
+    attr_reader :id, :name, :concepts
 
     def initialize(id, name, concepts=Hash.new())
         @id = id
@@ -85,7 +85,8 @@ class Curriculum
 end
 
 class Concept
-    attr_accessor :questions, :id, :name, :curriculum
+    attr_accessor :questions
+    attr_reader :id, :name, :curriculum
 
     def initialize(id, name, curriculum=nil, questions=Hash.new())
         @id = id
@@ -106,7 +107,7 @@ class Concept
 end
 
 class Question
-    attr_accessor :id, :difficulty, :concept
+    attr_reader :id, :difficulty, :concept
 
     def initialize(id, difficulty, concept=nil)
         @id = id

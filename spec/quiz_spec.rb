@@ -14,6 +14,7 @@ describe Concept do
         @question = Question.new(15, 0.73468)
         @questions = {@question.id => @question}
         @concept = @c = Concept.new(@id, @name, @curriculum, @questions)
+        @new_question = Question.new(5, 0.34)
     end
     it "has an ID and name" do
         expect(@c.id).to be_kind_of(Integer)
@@ -36,25 +37,22 @@ describe Concept do
     end
 
     it "can modify its questions" do
-        new_question = Question.new(5, 0.34)
-        @c.questions[new_question.id] = new_question
-        expect(@c.questions.keys).to include(new_question.id)
-        expect(@c.questions[new_question.id]).to be(new_question)
+        @c.questions[@new_question.id] = @new_question
+        expect(@c.questions.keys).to include(@new_question.id)
+        expect(@c.questions[@new_question.id]).to be(@new_question)
     end
 
     it "counts added questions" do
         expect(@c.question_count).to be 1
-        new_question = Question.new(5, 0.34)
-        @c.questions[new_question.id] = new_question
+        @c.questions[@new_question.id] = @new_question
         expect(@c.question_count).to be 2
     end
 
     it "generates question lists" do
-        new_question = Question.new(5, 0.34)
-        @c.questions[new_question.id] = new_question
+        @c.questions[@new_question.id] = @new_question
         list = @c.question_list(6)
         expect(list.length).to be 6
-        expect(list).to include(new_question.id, @question.id)
+        expect(list).to include(@new_question.id, @question.id)
     end
 end
 
