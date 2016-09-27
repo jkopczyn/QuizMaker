@@ -11,26 +11,25 @@ describe Concept do
         @id = 7
         @name = "TestNamePleaseIgnore"
         @curriculum = Curriculum.new(3, "")
+        @question_id = 15
+        @question = Question.new(@question_id, 0.73468)
+        @questions = {@question_id => @question}
+        @concept = @c = Concept.new(@id, @name, @curriculum, @questions)
     end
     it "has an ID and name" do
-        c = Concept.new(@id, @name)
-        expect(c.id).to be_kind_of(Integer)
-        expect(c.name).to be_kind_of(String)
-        expect(c.id).to eq(@id)
-        expect(c.name).to eq(@name)
+        expect(@c.id).to be_kind_of(Integer)
+        expect(@c.name).to be_kind_of(String)
+        expect(@c.id).to eq(@id)
+        expect(@c.name).to eq(@name)
     end
 
     it "can access its parent curriculum" do
-        c = Concept.new(@id, @name, @curriculum)
-        expect(c.curriculum).to be(@curriculum)
+        expect(@c.curriculum).to be(@curriculum)
     end
 
-    it "can access its questions" do
-        question_id = 15
-        question = Question.new(question_id, 0.73468)
-        c = Concept.new(@id, @name, @curriculum, {question_id => question})
-        expect(c.questions).not_to be_empty
-        expect(c.questions[question_id]).to be(question)
+    it "can access its @questions" do
+        expect(@c.questions).not_to be_empty
+        expect(@c.questions[@question_id]).to be(@question)
     end
 end
 
