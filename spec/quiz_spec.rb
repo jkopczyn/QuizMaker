@@ -8,14 +8,15 @@ describe Curriculum do
         @id = 9
         @name = "Underwater Basketweaving"
         @question = Question.new(15, 0.73468)
-        @new_question = Question.new(5, 0.34)
+        @second_question = Question.new(5, 0.34)
+        @third_question = Question.new(3, 0.5)
         @questions = {@question.id => @question,
-                      @new_question.id => @new_question }
+                      @second_question.id => @second_question }
         @concept = Concept.new(1, "A1", @curriculum, @questions)
         @concepts = {@concept.id => @concept}
         @curriculum = @c = Curriculum.new(@id, @name, @concepts)
         @second_concept = Concept.new(2, "B2", @curriculum,
-                                      { 3 => Question.new(3, 0.5) })
+                                      { @third_question.id => @third_question })
     end
     it "has an ID and name" do
         expect(@c.id).to be_kind_of(Integer)
@@ -33,6 +34,10 @@ describe Curriculum do
         expect(@c.concept_count).to be 1
     end
 
+    it "can count its questions" do
+        expect(@c.question_count).to be @concept.question_count
+    end
+
     it "can modify its concepts" do
         @c.concepts[@second_concept.id] = @second_concept
         expect(@c.concepts.keys).to include(@second_concept.id)
@@ -44,6 +49,26 @@ describe Curriculum do
         @c.concepts[@second_concept.id] = @second_concept
         expect(@c.concept_count).to be 2
     end
+
+    it "counts questions from multiple concepts" do
+        @c.concepts[@second_concept.id] = @second_concept
+        expect(@c.concept_count).to be 2
+        expect(@c.question_count).to be (@concept.question_count +
+                                         @second_concept.question_count)
+    end
+
+    it "generates question lists" do
+        list = @c.question_list(6)
+        expect(list.length).to be 6
+        expect(list).to include(@second_question.id, @question.id)
+    end
+
+    it "generates question lists from multiple concepts" do
+        @c.concepts[@second_concept.id] = @second_concept
+        list = @c.question_list(6)
+        expect(list.length).to be 6
+        expect(list).to include(@second_question.id, @question.id, @third_question.id)
+    end
 end
 
 describe Concept do
@@ -54,7 +79,7 @@ describe Concept do
         @question = Question.new(15, 0.73468)
         @questions = {@question.id => @question}
         @concept = @c = Concept.new(@id, @name, @curriculum, @questions)
-        @new_question = Question.new(5, 0.34)
+        @second_question = Question.new(5, 0.34)
     end
     it "has an ID and name" do
         expect(@c.id).to be_kind_of(Integer)
@@ -77,22 +102,22 @@ describe Concept do
     end
 
     it "can modify its questions" do
-        @c.questions[@new_question.id] = @new_question
-        expect(@c.questions.keys).to include(@new_question.id)
-        expect(@c.questions[@new_question.id]).to be(@new_question)
+        @c.questions[@second_question.id] = @second_question
+        expect(@c.questions.keys).to include(@second_question.id)
+        expect(@c.questions[@second_question.id]).to be(@second_question)
     end
 
     it "counts added questions" do
         expect(@c.question_count).to be 1
-        @c.questions[@new_question.id] = @new_question
+        @c.questions[@second_question.id] = @second_question
         expect(@c.question_count).to be 2
     end
 
     it "generates question lists" do
-        @c.questions[@new_question.id] = @new_question
+        @c.questions[@second_question.id] = @second_question
         list = @c.question_list(6)
         expect(list.length).to be 6
-        expect(list).to include(@new_question.id, @question.id)
+        expect(list).to include(@second_question.id, @question.id)
     end
 
     def questions_sorted?(question_list)
@@ -101,7 +126,7 @@ describe Concept do
         end.all?
     end
     it "generates question lists sorted by difficulty" do
-        @c.questions[@new_question.id] = @new_question
+        @c.questions[@second_question.id] = @second_question
         list_question_objects = @c.question_list(6).map { |v| @c.questions[v] }
         expect(questions_sorted?(list_question_objects))
     end
