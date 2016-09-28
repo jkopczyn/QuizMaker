@@ -4,6 +4,46 @@ describe Classroom do
 end
 
 describe Curriculum do
+    before(:example) do
+        @id = 9
+        @name = "Underwater Basketweaving"
+        @question = Question.new(15, 0.73468)
+        @new_question = Question.new(5, 0.34)
+        @questions = {@question.id => @question,
+                      @new_question.id => @new_question }
+        @concept = Concept.new(1, "A1", @curriculum, @questions)
+        @concepts = {@concept.id => @concept}
+        @curriculum = @c = Curriculum.new(@id, @name, @concepts)
+        @second_concept = Concept.new(2, "B2", @curriculum,
+                                      { 3 => Question.new(3, 0.5) })
+    end
+    it "has an ID and name" do
+        expect(@c.id).to be_kind_of(Integer)
+        expect(@c.name).to be_kind_of(String)
+        expect(@c.id).to eq(@id)
+        expect(@c.name).to eq(@name)
+    end
+
+    it "can access its concepts" do
+        expect(@c.concepts).not_to be_empty
+        expect(@c.concepts[@concept.id]).to be(@concept)
+    end
+
+    it "can count its concepts" do
+        expect(@c.concept_count).to be 1
+    end
+
+    it "can modify its concepts" do
+        @c.concepts[@second_concept.id] = @second_concept
+        expect(@c.concepts.keys).to include(@second_concept.id)
+        expect(@c.concepts[@second_concept.id]).to be(@second_concept)
+    end
+
+    it "counts added concepts" do
+        expect(@c.concept_count).to be 1
+        @c.concepts[@second_concept.id] = @second_concept
+        expect(@c.concept_count).to be 2
+    end
 end
 
 describe Concept do
