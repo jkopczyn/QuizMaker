@@ -60,14 +60,19 @@ describe Curriculum do
     it "generates question lists" do
         list = @c.question_list(6)
         expect(list.length).to be 6
-        expect(list).to include(@second_question.id, @question.id)
+        expect(list).to include(@question.id, @second_question.id)
     end
 
     it "generates question lists from multiple concepts" do
         @c.concepts[@second_concept.id] = @second_concept
         list = @c.question_list(6)
         expect(list.length).to be 6
-        expect(list).to include(@second_question.id, @question.id, @third_question.id)
+        expect(list).to include(
+            @question.id, @second_question.id, @third_question.id)
+    end
+
+    it "generates balanced lists of questions" do
+        fail
     end
 end
 
@@ -117,7 +122,7 @@ describe Concept do
         @c.questions[@second_question.id] = @second_question
         list = @c.question_list(6)
         expect(list.length).to be 6
-        expect(list).to include(@second_question.id, @question.id)
+        expect(list).to include(@question.id, @second_question.id)
     end
 
     def questions_sorted?(question_list)
